@@ -33,7 +33,7 @@ def createGraph(n, m):
     random.shuffle(nodes)
     for i in range(1, n):
         u = nodes[i]
-        v = random.randint(0, i - 1)
+        v = nodes[random.randint(0, i - 1)]
         G.add_edge(u, v)
 
     # Add extra edges to reach m edges.
@@ -58,7 +58,6 @@ def assignNodes(G):
     nodes = {}
     
     nodeIds = list(range(1, n + 1))
-    random.shuffle(nodeIds)
 
     for i, graphNode in enumerate(G.nodes()):
         node = Node(nodeId=nodeIds[i])
@@ -94,3 +93,33 @@ def convertGraphDAG(G, nodes):
         node.updateType()
 
     return nodes
+
+"""
+getSources(nodes)
+nodes: (Dictionary) Nodes in the DAG graph.
+Checks all the nodes and retrieves the sources.
+Returns a list of all source nodes.
+"""
+def getSources(nodes):
+    sources = []
+    
+    for node in nodes.values():
+        if node.type == 'source':
+            sources.append(node)
+    
+    return sources
+
+"""
+getSinks(nodes)
+nodes: (Dictionary) Nodes in the DAG graph.
+Checks all the nodes and retrieves the sinks.
+Returns a list of all sink nodes.
+"""
+def getSinks(nodes):
+    sources = []
+    
+    for node in nodes.values():
+        if node.type == 'sink':
+            sources.append(node)
+    
+    return sources

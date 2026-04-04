@@ -29,3 +29,9 @@ class Node:
             self.type = 'sink'
         else:
             self.type = 'internal'
+
+    def receiveMessage(self, message):
+        self.messages.append(message)
+
+    def clearMessages(self):
+        self.messages.clear()
