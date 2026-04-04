@@ -1,0 +1,23 @@
+# CSI 4109 - Assignment 3
+*Implementation of the Yo-Yo algorithm.*
+
+## Setup / Instructions:
+1. Clone the repository.
+
+2. Start up your virtual machine. We are using [venv](https://docs.python.org/3/library/venv.html).
+
+    *Note: This is optional, skip to the next step if you do not wish to use a VM.*
+
+   In your terminal, type:
+
+   ```python -m venv venv```
+  
+4. Install the dependencies. In your terminal, type:
+
+   ```pip install -r requirements.txt```
+
+5. Your virtual machine now has the required dependencies.
+
+6. Run the program by typing in the terminal:
+
+   ```python main.py```
