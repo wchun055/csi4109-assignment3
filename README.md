@@ -16,8 +16,8 @@
 
    ```pip install -r requirements.txt```
 
-5. Your virtual environment/computer now has the required dependencies.
+   Your virtual environment/computer now has the required dependencies.
 
-6. Run the program by typing in the terminal:
+5. Run the program by typing in the terminal:
 
    ```python main.py```
