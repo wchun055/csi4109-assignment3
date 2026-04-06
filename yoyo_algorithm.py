@@ -58,24 +58,32 @@ def yoUp(nodes):
 
         # Get minimum value from all messages.
         if node.messages:
-            min_val = min(node.messages.values())
-            min_senders = [sid for sid, val in node.messages.items() if val == min_val]
+            minVal = min(node.messages.values())
+            minSenders = [sid for sid, val in node.messages.items() if val == minVal]
 
-            for in_node in node.inEdges:
-                if in_node.id in min_senders:
-                    in_node.replies[node.id] = "Yes"
+            for inNode in node.inEdges:
+                if inNode.id in minSenders:
+                    inNode.replies[node.id] = "Yes"
                 else:
-                    in_node.replies[node.id] = "No"
+                    inNode.replies[node.id] = "No"
 
             # If all outward neighbours replied, add to processed set.
-            for in_node in node.inEdges:
-                if all(out_node.id in in_node.replies for out_node in in_node.outEdges):
-                    if in_node not in processed and in_node not in queue:
-                        queue.append(in_node)
+            for inNode in node.inEdges:
+                allReplied = True
+                
+                for outNode in inNode.outEdges:
+                    if outNode.id not in inNode.replies:
+                        allReplied = False
+                        break
+                
+                if allReplied and inNode not in processed and inNode not in queue:
+                    queue.append(inNode)
 
     pruneSinks(nodes)
-    
+
     pruneRedundant(nodes)
+
+    flipEdges(nodes)
 
     return nodes    
 
@@ -107,14 +115,33 @@ def pruneRedundant(nodes):
             if reply == "Yes":
                 yEdges.append(nodeId)
 
-        for node_id in yEdges[1:]: # Look at all Yes edges, skipping one.
+        for nodeId in yEdges[1:]: # Look at all Yes edges, skipping one.
             neighbor = None
             
             for n in node.outEdges:
-                if n.id == node_id:
+                if n.id == nodeId:
                     neighbor = n
                     break # Stop if neighbour found in outgoing edges.
             
             if neighbor is not None: # If we found a neighbour, remove the connection from the edges.
                 node.outEdges.remove(neighbor)
                 neighbor.inEdges.remove(node)
+
+def flipEdges(nodes):
+    for node in nodes.values():
+        for outNodeId, reply in node.replies.items():
+            if reply == "No":
+                neighbor = next((n for n in node.outEdges if n.id == outNodeId), None)
+                
+                if neighbor:
+                    # Remove original edge.
+                    node.outEdges.remove(neighbor)
+                    neighbor.inEdges.remove(node)
+                    
+                    # Add flipped edge.
+                    node.inEdges.add(neighbor)
+                    neighbor.outEdges.add(node)
+    
+    # Update node types.
+    for node in nodes.values():
+        node.updateType()

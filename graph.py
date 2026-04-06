@@ -125,4 +125,5 @@ def getSinks(nodes):
     return sources
 
 def removeNode(nodes, id):
-    del nodes(id)
+    if id in nodes:
+        del nodes[id]
