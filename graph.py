@@ -123,3 +123,6 @@ def getSinks(nodes):
             sources.append(node)
     
     return sources
+
+def removeNode(nodes, id):
+    del nodes(id)

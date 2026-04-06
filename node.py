@@ -8,8 +8,8 @@ class Node:
         self.id = nodeId # Node ID.
         self.inEdges = set() # All incoming neighbour edges.
         self.outEdges = set() # All outgoing neighbour edges.
-        self.messages = [] # List of received values from incoming neighbours.
-        self.replies = [] # Yes, No.
+        self.messages = {} # Contains all retained values and who it came from.
+        self.replies = {} # Yes/No & the sender ID.
         self.type = None
     
     def updateType(self):
@@ -23,8 +23,14 @@ class Node:
         else:
             self.type = 'internal'
 
-    def receiveMessage(self, message):
-        self.messages.append(message)
+    def addMessage(self, sender, value):
+        self.messages[sender] = value
 
     def clearMessages(self):
         self.messages.clear()
+
+    def addReply(self, sender, value):
+        self.replies[sender] = value
+
+    def clearReplies(self):
+        self.replies.clear()
