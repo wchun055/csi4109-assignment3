@@ -8,8 +8,8 @@ class Node:
         self.id = nodeId # Node ID.
         self.inEdges = set() # All incoming neighbour edges.
         self.outEdges = set() # All outgoing neighbour edges.
-        self.messages = {} # Contains all retained values and who it came from.
-        self.replies = {} # Yes/No & the sender ID.
+        self.messages = {} # Contains all retained values and who it came from. [ID]=Value
+        self.replies = {} # Yes/No & the sender ID. [ID]=Yes/No
         self.type = None
     
     def updateType(self):

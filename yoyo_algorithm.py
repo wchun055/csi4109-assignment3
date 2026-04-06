@@ -73,6 +73,10 @@ def yoUp(nodes):
                     if in_node not in processed and in_node not in queue:
                         queue.append(in_node)
 
+    pruneSinks(nodes)
+    
+    pruneRedundant(nodes)
+
     return nodes    
 
 """
@@ -88,4 +92,29 @@ def pruneSinks(nodes):
         if len(sink.inEdges) == 1: # Only prune sinks with one incoming edge.
             parent = next(iter(sink.inEdges)) # Get parent of the sink.
             parent.outEdges.remove(sink) # Get rid of the link from the sink and its parent.
-            graph.removeNode(nodes, sink.id) # Remove sink node.
+            graph.removeNode(nodes, sink.id) # Remove sink node from node dictionary.
+
+"""
+pruneRedundant(nodes)
+nodes: (Dictionary)
+Prune outgoing edges with identical minimal (Yes) values.
+"""
+def pruneRedundant(nodes):
+    for node in nodes.values():
+        yEdges = []
+
+        for nodeId, reply in node.replies.items(): # All outgoing edges with Yes reply.
+            if reply == "Yes":
+                yEdges.append(nodeId)
+
+        for node_id in yEdges[1:]: # Look at all Yes edges, skipping one.
+            neighbor = None
+            
+            for n in node.outEdges:
+                if n.id == node_id:
+                    neighbor = n
+                    break # Stop if neighbour found in outgoing edges.
+            
+            if neighbor is not None: # If we found a neighbour, remove the connection from the edges.
+                node.outEdges.remove(neighbor)
+                neighbor.inEdges.remove(node)
