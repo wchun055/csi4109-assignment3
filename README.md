@@ -4,7 +4,7 @@
 ## Setup / Instructions:
 1. Clone the repository.
 
-2. Start up your virtual machine. We are using [venv](https://docs.python.org/3/library/venv.html).
+2. Start up your virtual environment. We are using [venv](https://docs.python.org/3/library/venv.html).
 
     *Note: This is optional, skip to the next step if you do not wish to use a VM.*
 
@@ -16,7 +16,7 @@
 
    ```pip install -r requirements.txt```
 
-5. Your virtual machine now has the required dependencies.
+5. Your virtual environment/computer now has the required dependencies.
 
 6. Run the program by typing in the terminal:
 
