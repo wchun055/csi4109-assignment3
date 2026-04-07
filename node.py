@@ -8,17 +8,10 @@ class Node:
         self.id = nodeId # Node ID.
         self.inEdges = set() # All incoming neighbour edges.
         self.outEdges = set() # All outgoing neighbour edges.
-        self.messages = [] # List of received values from incoming neighbours.
-        self.replies = [] # Yes, No.
+        self.messages = {} # Contains all retained values and who it came from. [ID]=Value
+        self.replies = {} # Yes/No & the sender ID. [ID]=Yes/No
         self.type = None
     
-    """
-    updateType(self)
-    Checks the number of incoming and outgoing edges the node has and updates type.
-    If they have incoming and outgoing, they are internal.
-    If they only have incoming, they are a sink.
-    If they only have outgoin, they are a source.
-    """
     def updateType(self):
         indeg = len(self.inEdges)
         outdeg = len(self.outEdges)
@@ -30,8 +23,14 @@ class Node:
         else:
             self.type = 'internal'
 
-    def receiveMessage(self, message):
-        self.messages.append(message)
+    def addMessage(self, sender, value):
+        self.messages[sender] = value
 
     def clearMessages(self):
         self.messages.clear()
+
+    def addReply(self, sender, value):
+        self.replies[sender] = value
+
+    def clearReplies(self):
+        self.replies.clear()
