@@ -49,6 +49,8 @@ def runTests():
                 nodes1 = convertGraphDAG(G1, nodes1)
                 updateAll(nodes1)
 
+                messageCount = 2*m
+
                 # Continue calling yoDown() and yoUp() until we are left with one node.
                 while len(nodes1) > 1:
                     nodes1, messageCount = yoDown(nodes1, messageCount)
@@ -87,6 +89,9 @@ def runTests():
                 nodes2 = assignNodes(G2)
                 nodes2 = convertGraphDAG(G2, nodes2)
                 updateAll(nodes2)
+
+                messageCount = 2*m
+
                 # Continue calling yoDown() and yoUp() until we are left with one node.
                 while len(nodes2) > 1:
                     nodes2, messageCount = yoDown(nodes2, messageCount)
