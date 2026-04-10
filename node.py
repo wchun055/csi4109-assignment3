@@ -18,9 +18,9 @@ class Node:
 
         if indeg == 0 and outdeg > 0:
             self.type = 'source'
-        elif outdeg == 0 and indeg > 0:
+        elif outdeg == 0 and indeg > 0 or outdeg == 0 and indeg == 0:
             self.type = 'sink'
-        else:
+        elif indeg > 0 and outdeg > 0:
             self.type = 'internal'
 
     def addMessage(self, sender, value):
