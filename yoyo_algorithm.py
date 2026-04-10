@@ -8,12 +8,13 @@ from collections import deque
 import graph
 
 """
-yoDown(nodes)
+yoDown(nodes, messageCount)
 nodes: (Dictionary)
+messageCount: (Integer)
 Sources send their ID to through out edges. Internal nodes that receive messages from all their inward 
 Return updated nodes with received messages.
 """
-def yoDown(nodes):
+def yoDown(nodes, messageCount):
     sources = graph.getSources(nodes) # List of sources.
     queue = deque() # Queue of nodes that have received from all of their inward edges.
     processed = set() # Nodes that have been processed from queue.
@@ -25,6 +26,7 @@ def yoDown(nodes):
     for source in sources:
         for neighbour in source.outEdges:
             neighbour.addMessage(source.id, source.id)
+            messageCount+=1
 
             # If a node has received messages from all their inward edges and not in processed, add to queue.
             if len(neighbour.messages) == len(neighbour.inEdges) and neighbour not in processed:
@@ -38,13 +40,22 @@ def yoDown(nodes):
 
         for neighbour in node.outEdges:
             neighbour.addMessage(node.id, minValue)
+            messageCount+=1
+
             if len(neighbour.messages) == len(neighbour.inEdges) and neighbour not in processed:
                 queue.append(neighbour)
                 processed.add(neighbour)
 
-    return nodes
+    return nodes, messageCount
 
-def yoUp(nodes):
+"""
+yoUp(nodes, messageCount)
+nodes: (Dictionary)
+messageCount: (Integer)
+Sinks send their replies, it is passed through internals and reach the sources.
+Then, we prune the redundant Yes replies and sinks. We flip the edges.
+"""
+def yoUp(nodes, messageCount):
     sinks = graph.getSinks(nodes) # List of sinks.
     queue = deque(sinks)
     processed = set()
@@ -66,8 +77,10 @@ def yoUp(nodes):
             for inNode in node.inEdges:
                 if inNode.id in minSenders:
                     inNode.replies[node.id] = "Yes"
+                    messageCount+=1
                 else:
                     inNode.replies[node.id] = "No"
+                    messageCount+=1
 
         # Internal node reply.
         else:
@@ -81,13 +94,16 @@ def yoUp(nodes):
                 for inNode in node.inEdges:
                     if inNode.id in minSenders: # Only send Yes to the minimum.
                         inNode.replies[node.id] = "Yes"
+                        messageCount+=1
                     else:
                         inNode.replies[node.id] = "No"
+                        messageCount+=1
 
             # If we only have No replies, send everyone No.
             else:
                 for inNode in node.inEdges:
                     inNode.replies[node.id] = "No"
+                    messageCount+=1
 
         for inNode in node.inEdges:
             allReplied = True
@@ -108,7 +124,7 @@ def yoUp(nodes):
 
     flipEdges(nodes)
 
-    return nodes 
+    return nodes, messageCount
 
 """
 pruneSinks(nodes)
