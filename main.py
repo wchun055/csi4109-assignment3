@@ -41,7 +41,7 @@ def runTests():
             print("m =", m)
             totalMessageCount = 0
 
-            for i in range(10):
+            for i in range(1000):
                 messageCount = 0
 
                 G1 = createGraph(n, m)
@@ -80,7 +80,7 @@ def runTests():
             print("m =", m)
             totalMessageCount = 0
 
-            for i in range(10):
+            for i in range(1000):
                 messageCount = 0
 
                 G2 = createGraph(n, m)
