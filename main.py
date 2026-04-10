@@ -4,10 +4,12 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from node import Node
-from graph import createGraph, assignNodes, convertGraphDAG, getSources
-from yoyo_algorithm import yoDown, yoUp
+from graph import createGraph, assignNodes, convertGraphDAG, removeNode
+from yoyo_algorithm import yoDown, yoUp, updateAll
 
-################################################## TEST FUNCTIONS ##################################################
+"""
+Test functions to print out graph + node info.
+"""
 def printGraphInfo(nodes):
     for node in nodes.values():
         print(f"Node {node.id}: "
@@ -23,8 +25,7 @@ def visualizeGraph(G, title="Graph"):
     plt.title(title)
     plt.show()
 
-################################################## RUN ##################################################
-
+# RUN HERE
 if __name__ == "__main__":
     n = 6
     m = 8
@@ -36,8 +37,7 @@ if __name__ == "__main__":
 
     nodes = convertGraphDAG(G, nodes)
 
-    for node in nodes.values():
-        node.updateType()
+    updateAll(nodes)
 
     #printGraphInfo(nodes)
 
