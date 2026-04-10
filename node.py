@@ -12,6 +12,10 @@ class Node:
         self.replies = {} # Yes/No & the sender ID. [ID]=Yes/No
         self.type = None
     
+    """
+    updateType()
+    Check the amount of outgoing and incoming edges to determine the node type.
+    """
     def updateType(self):
         indeg = len(self.inEdges)
         outdeg = len(self.outEdges)

@@ -1,13 +1,15 @@
 # main.py
-
+import math
 import networkx as nx
 import matplotlib.pyplot as plt
 
 from node import Node
-from graph import createGraph, assignNodes, convertGraphDAG, getSources
-from yoyo_algorithm import yoDown, yoUp
+from graph import createGraph, assignNodes, convertGraphDAG, removeNode
+from yoyo_algorithm import yoDown, yoUp, updateAll
 
-################################################## TEST FUNCTIONS ##################################################
+"""
+Test functions to print out graph + node info.
+"""
 def printGraphInfo(nodes):
     for node in nodes.values():
         print(f"Node {node.id}: "
@@ -23,33 +25,29 @@ def visualizeGraph(G, title="Graph"):
     plt.title(title)
     plt.show()
 
-################################################## RUN ##################################################
-
+# RUN HERE
 if __name__ == "__main__":
-    n = 6
-    m = 8
+    n_values = [20, 30, 40, 60, 80, 100]
 
-    G = createGraph(n, m)
-    #visualizeGraph(G)
+    for n in n_values:
+        m_values = [n, (n * math.log2(n)), (n * math.sqrt(n)), ((n*(n-1))/2)]
+        print("n: ", n)
 
-    nodes = assignNodes(G)
+        for m in m_values:
+            print("m: ", m)
 
-    nodes = convertGraphDAG(G, nodes)
+            G = createGraph(n, m)
+            #visualizeGraph(G)
 
-    for node in nodes.values():
-        node.updateType()
+            nodes = assignNodes(G)
 
-    #printGraphInfo(nodes)
+            nodes = convertGraphDAG(G, nodes)
 
-    # Continue calling yoDown() and yoUp() until we are left with one node.
-    while len(nodes) > 1:
+            updateAll(nodes)
 
-        nodes = yoDown(nodes)
-        print()
-        print("YO DOWN COMPLETE:")
-        printGraphInfo(nodes)
+            #printGraphInfo(nodes)
 
-        nodes = yoUp(nodes)
-        print()
-        print("YO UP COMPLETE:")
-        printGraphInfo(nodes)
+            # Continue calling yoDown() and yoUp() until we are left with one node.
+            while len(nodes) > 1:
+                nodes = yoDown(nodes)
+                nodes = yoUp(nodes)

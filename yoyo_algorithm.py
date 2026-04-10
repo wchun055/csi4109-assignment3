@@ -143,16 +143,12 @@ def pruneSinks(nodes):
         # Update nodes to check if we have new sinks (with one edge).
         updateAll(nodes)
 
-    print("DONE PRUNING SINKS\n")
-
 """
 pruneRedundant(nodes)
 nodes: (Dictionary)
 Prune outgoing edges with identical minimal (Yes) values. (Make sure to leave one.)
 """
 def pruneRedundant(nodes):
-    print("\nPRUNE REDUNDANT")
-
     for node in list(nodes.values()):
         yes_neighbors = []
 
