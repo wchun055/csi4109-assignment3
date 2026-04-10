@@ -12,15 +12,19 @@ class Node:
         self.replies = {} # Yes/No & the sender ID. [ID]=Yes/No
         self.type = None
     
+    """
+    updateType()
+    Check the amount of outgoing and incoming edges to determine the node type.
+    """
     def updateType(self):
         indeg = len(self.inEdges)
         outdeg = len(self.outEdges)
 
         if indeg == 0 and outdeg > 0:
             self.type = 'source'
-        elif outdeg == 0 and indeg > 0:
+        elif outdeg == 0 and indeg > 0 or outdeg == 0 and indeg == 0:
             self.type = 'sink'
-        else:
+        elif indeg > 0 and outdeg > 0:
             self.type = 'internal'
 
     def addMessage(self, sender, value):

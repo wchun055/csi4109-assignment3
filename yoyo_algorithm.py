@@ -45,19 +45,21 @@ def yoDown(nodes):
     return nodes
 
 def yoUp(nodes):
-    sinks = graph.getSinks(nodes)
+    sinks = graph.getSinks(nodes) # List of sinks.
     queue = deque(sinks)
     processed = set()
 
-    for node in nodes.values(): # Clear out all past replies in a node.
+    for node in nodes.values():
         node.clearReplies()
 
     while queue:
         node = queue.popleft()
-        processed.add(node)
 
-        # Get minimum value from all messages.
-        if node.messages:
+        if not node.messages:
+            continue
+
+        # Handle replies if the node is a sink.
+        if node.type == "sink":
             minVal = min(node.messages.values())
             minSenders = [sid for sid, val in node.messages.items() if val == minVal]
 
@@ -67,66 +69,114 @@ def yoUp(nodes):
                 else:
                     inNode.replies[node.id] = "No"
 
-            # If all outward neighbours replied, add to processed set.
-            for inNode in node.inEdges:
-                allReplied = True
-                
-                for outNode in inNode.outEdges:
-                    if outNode.id not in inNode.replies:
-                        allReplied = False
-                        break
-                
-                if allReplied and inNode not in processed and inNode not in queue:
-                    queue.append(inNode)
+        # Internal node reply.
+        else:
+            # Collect replies from outgoing edges.
+            childReplies = [node.replies.get(out.id) for out in node.outEdges]
 
-    pruneSinks(nodes)
+            if any(reply == "Yes" for reply in childReplies):
+                minVal = min(node.messages.values())
+                minSenders = [sid for sid, val in node.messages.items() if val == minVal]
 
+                for inNode in node.inEdges:
+                    if inNode.id in minSenders: # Only send Yes to the minimum.
+                        inNode.replies[node.id] = "Yes"
+                    else:
+                        inNode.replies[node.id] = "No"
+
+            # If we only have No replies, send everyone No.
+            else:
+                for inNode in node.inEdges:
+                    inNode.replies[node.id] = "No"
+
+        for inNode in node.inEdges:
+            allReplied = True
+
+            for outNode in inNode.outEdges:
+                if outNode.id not in inNode.replies:
+                    allReplied = False
+                    break
+
+            if allReplied and inNode not in processed and inNode not in queue:
+                queue.append(inNode)
+
+        processed.add(node) # Make sure to add nodes to processed so that we do not repeat.
+
+    #Prune and then flip edges.
     pruneRedundant(nodes)
+    pruneSinks(nodes)
 
     flipEdges(nodes)
 
-    return nodes    
+    return nodes 
 
 """
 pruneSinks(nodes)
 nodes: (Dictionary)
-Prune all sink nodes that only have one incoming edge. 
+Prune all sink nodes that only have one incoming edge. (Clean up disconnected nodes if needed.)
 Get rid of the connecting edge between the parent and the sink.
 """
 def pruneSinks(nodes):
-    sinks = graph.getSinks(nodes)
-    
-    for sink in sinks:
-        if len(sink.inEdges) == 1: # Only prune sinks with one incoming edge.
-            parent = next(iter(sink.inEdges)) # Get parent of the sink.
-            parent.outEdges.remove(sink) # Get rid of the link from the sink and its parent.
-            graph.removeNode(nodes, sink.id) # Remove sink node from node dictionary.
+    while True:
+        sinks = list(graph.getSinks(nodes))
+        pruned_any = False
+
+        for sink in sinks:
+            # Checking if the node is a disconnected node, and not the last node.
+            if len(nodes) != 1 and (len(sink.inEdges) == 0 and len(sink.outEdges) == 0):
+                graph.removeNode(nodes, sink.id-1)
+
+            if len(sink.inEdges) == 1:
+                parent = next(iter(sink.inEdges))
+
+                parent.outEdges.discard(sink)
+                sink.inEdges.discard(parent)
+
+                graph.removeNode(nodes, sink.id-1)
+
+                pruned_any = True # If something was pruned, we need to update all nodes and check again.
+
+        # Skip to the end if nothing was pruned.
+        if not pruned_any:
+            break
+
+        # Update nodes to check if we have new sinks (with one edge).
+        updateAll(nodes)
 
 """
 pruneRedundant(nodes)
 nodes: (Dictionary)
-Prune outgoing edges with identical minimal (Yes) values.
+Prune outgoing edges with identical minimal (Yes) values. (Make sure to leave one.)
 """
 def pruneRedundant(nodes):
-    for node in nodes.values():
-        yEdges = []
+    for node in list(nodes.values()):
+        yes_neighbors = []
 
-        for nodeId, reply in node.replies.items(): # All outgoing edges with Yes reply.
-            if reply == "Yes":
-                yEdges.append(nodeId)
+        # Get all Yes outgoing.
+        for neighbor in node.outEdges:
+            if node.replies.get(neighbor.id) == "Yes":
+                yes_neighbors.append(neighbor)
 
-        for nodeId in yEdges[1:]: # Look at all Yes edges, skipping one.
-            neighbor = None
-            
-            for n in node.outEdges:
-                if n.id == nodeId:
-                    neighbor = n
-                    break # Stop if neighbour found in outgoing edges.
-            
-            if neighbor is not None: # If we found a neighbour, remove the connection from the edges.
-                node.outEdges.remove(neighbor)
-                neighbor.inEdges.remove(node)
+        # Skip if there is only one Yes.
+        if len(yes_neighbors) <= 1:
+            continue
 
+        def edge_key(n):
+            return node.messages.get(n.id, float('inf'))
+
+        yes_neighbors.sort(key=edge_key)
+
+        kept = yes_neighbors[0]
+
+        for neighbor in yes_neighbors[1:]:
+            node.outEdges.discard(neighbor)
+            neighbor.inEdges.discard(node)
+
+"""
+flipEdges(nodes)
+nodes: (Dictionary)
+Flip edge direction that had No reply.
+"""
 def flipEdges(nodes):
     for node in nodes.values():
         for outNodeId, reply in node.replies.items():
@@ -143,5 +193,13 @@ def flipEdges(nodes):
                     neighbor.outEdges.add(node)
     
     # Update node types.
+    updateAll(nodes)
+
+"""
+updateAll(nodes)
+nodes: (Dictionary)
+Update all nodes types.
+"""
+def updateAll(nodes):
     for node in nodes.values():
         node.updateType()
