@@ -26,9 +26,6 @@ def visualizeGraph(G, title="Graph"):
 ################################################## RUN ##################################################
 
 if __name__ == "__main__":
-    #Testing...
-    #m = int(n * math.log(n))
-
     n = 6
     m = 8
 
@@ -38,17 +35,21 @@ if __name__ == "__main__":
     nodes = assignNodes(G)
 
     nodes = convertGraphDAG(G, nodes)
-    print("DAG Info:")
-    printGraphInfo(nodes)
 
-    yoDown(nodes)
+    for node in nodes.values():
+        node.updateType()
 
-    print()
-    print("YO DOWN COMPLETE:")
-    printGraphInfo(nodes)
+    #printGraphInfo(nodes)
 
-    yoUp(nodes)
+    # Continue calling yoDown() and yoUp() until we are left with one node.
+    while len(nodes) > 1:
 
-    print()
-    print("YO UP COMPLETE:")
-    printGraphInfo(nodes)
+        nodes = yoDown(nodes)
+        print()
+        print("YO DOWN COMPLETE:")
+        printGraphInfo(nodes)
+
+        nodes = yoUp(nodes)
+        print()
+        print("YO UP COMPLETE:")
+        printGraphInfo(nodes)
