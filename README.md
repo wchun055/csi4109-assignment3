@@ -6,7 +6,7 @@
 
 2. Start up your virtual environment. We are using [venv](https://docs.python.org/3/library/venv.html).
 
-    *Note: This is optional, skip to the next step if you do not wish to use a VM.*
+    *Note: This is optional, skip to the next step if you do not wish to use a virtual environment.*
 
    In your terminal, type:
 
